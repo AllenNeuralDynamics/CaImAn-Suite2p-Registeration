@@ -15,12 +15,12 @@ pipeline=$3  # The third argument specifies which pipeline to use (caiman or sui
 if [ "$pipeline" == "caiman" ]; then
     # Run CaImAn pipeline
     echo "Running CaImAn pipeline..."
-    python -u run_capsule.py --input "$input" --output "$output" --pipeline caiman
+    python -u run_capsule.py --input "$input" --output "$output" --caiman True
 
 elif [ "$pipeline" == "suite2p" ]; then
     # Run Suite2p pipeline
     echo "Running Suite2p pipeline..."
-    python -u run_capsule.py --input "$input" --output "$output" --pipeline suite2p
+    python -u run_capsule.py --input "$input" --output "$output" --suite2p True
 
 else
     echo "Error: Invalid pipeline specified. Use 'caiman' or 'suite2p'."
