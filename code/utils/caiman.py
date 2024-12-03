@@ -24,6 +24,7 @@ def pad_movie(movie, output_shape, constant_values):
 
 # Main CaImAn registration function with padding
 def CaImAnRegistration(fname, output_path_caiman, output_shape=None, constant_values=0):
+    print('fname', fname)
     try:
         cv2.setNumThreads(0)
     except:
@@ -81,7 +82,3 @@ def CaImAnRegistration(fname, output_path_caiman, output_shape=None, constant_va
         hdf.create_dataset('R', data=x_shifts)
         hdf.create_dataset('C', data=y_shifts)
 
-    # x_shifts_mean = np.mean(x_shifts)
-    # y_shifts_mean = np.mean(y_shifts)
-
-    # return x_shifts , y_shifts 

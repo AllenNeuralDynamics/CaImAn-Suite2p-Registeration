@@ -12,7 +12,7 @@ import warnings
 from utils.caiman import CaImAnRegistration
 from utils.suite2p import suite2pRegistration
 
-def process_file(fn, folder_number, output_path, use_suite2p, use_caiman, writetiff):
+def process_file(fn, folder_number, output_path, use_suite2p, use_caiman):
     try:
         name, ext = os.path.splitext(os.path.basename(fn))
         success = True  # Assume success unless an error occurs
@@ -47,32 +47,8 @@ def run(data_dir, output_path, use_suite2p, use_caiman, writetiff):
         os.makedirs(output_path)
         print('Output directory created at', output_path)
 
-    tif_files = []
-    for root, dirs, files in os.walk(data_dir):
-        for file in files:
-            if file.endswith('.tif'):
-                file_path = os.path.join(root, file)
-                folder_number = os.path.basename(os.path.dirname(file_path))
-                tif_files.append((file_path, folder_number))
-
-    print('tif_files--->', tif_files)
-    tif_files_sorted = sorted(tif_files, key=lambda x: int(x[1]))
-
-    logging.basicConfig(level=logging.INFO)
-
-    failed_files = []
-    
-    for i, (fn, folder_number) in enumerate(tif_files_sorted, start=1):
-        print(f'Files left: {len(tif_files) - i}')
-        if not process_file(fn, folder_number, output_path, use_suite2p, use_caiman, writetiff):
-            failed_files.append((fn, folder_number))
-
-    # Retry processing failed files
-    if failed_files:
-        print("Retrying failed files...")
-        for fn, folder_number in failed_files:
-            print(f'Retrying file: {fn}')
-            process_file(fn, folder_number, output_path, use_suite2p, use_caiman, writetiff)
+    folder_number =  os.path.basename(os.path.dirname(data_dir))
+    process_file(data_dir, folder_number, output_path, use_suite2p, use_caiman)
 
 if __name__ == "__main__": 
     # Create argument parser

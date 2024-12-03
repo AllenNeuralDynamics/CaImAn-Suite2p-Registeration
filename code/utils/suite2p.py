@@ -58,6 +58,3 @@ def suite2pRegistration(fn, output_path_temp, folder_number,output_path_suite2p)
   with h5py.File(output_path_suite2p+'.h5', 'w') as hdf:
       hdf.create_dataset('R', data=opsEnd['xoff'])
       hdf.create_dataset('C', data=opsEnd['yoff'])
-
-  # Center the shifts to zero 
-  # return opsEnd['xoff'], opsEnd['yoff']
