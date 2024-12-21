@@ -22,6 +22,29 @@ def pad_array_center(input_array, output_shape, constant_values):
 def pad_movie(movie, output_shape, constant_values):
     return np.array(list(map(lambda arr: pad_array_center(arr, output_shape, constant_values), movie)))
 
+import numpy as np
+
+def process_image_channel(data):
+    """
+    Processes multi-channel or single-channel image data.
+    
+    Args:
+        data (numpy.ndarray): Input image data
+    
+    Returns:
+        numpy.ndarray: Processed image data with first channel extracted and squeezed
+    """
+    # Check input dimensionality
+    if data.ndim == 4 and data.shape[1] > 1:
+        # Multi-channel data: extract first channel
+        data = data[:, 1, :, :]
+    
+    # Ensure final shape is (height, width, depth)
+    if data.ndim == 4:
+        data = data.squeeze()
+    
+    return data
+
 # Main CaImAn registration function with padding
 def CaImAnRegistration(fname, output_path_caiman, output_shape=None, constant_values=0):
     print('fname', fname)
@@ -32,7 +55,8 @@ def CaImAnRegistration(fname, output_path_caiman, output_shape=None, constant_va
 
     # Load the movie data
     data = imread(fname)  # TODO: Add logic for h5 as well
-
+    data = process_image_channel(data_multi)
+   
     # Determine output shape for padding if not provided
     if output_shape is None:
         output_shape = data.shape[1:]  # Use existing frame dimensions if no output shape is specified
@@ -58,7 +82,7 @@ def CaImAnRegistration(fname, output_path_caiman, output_shape=None, constant_va
     # Create a motion correction object using padded data
     mc = MotionCorrect(padded_data, dview=dview, max_shifts=max_shifts,
                        shifts_opencv=shifts_opencv, nonneg_movie=True,
-                       border_nan=border_nan, channel = 1) #TODO: For in-vivo data with 2 channel data, set channel to 1.  
+                       border_nan=border_nan)
 
     # Perform motion correction
     mc.motion_correct(save_movie=True)
