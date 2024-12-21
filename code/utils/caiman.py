@@ -55,7 +55,7 @@ def CaImAnRegistration(fname, output_path_caiman, output_shape=None, constant_va
 
     # Load the movie data
     data = imread(fname)  # TODO: Add logic for h5 as well
-    data = process_image_channel(data_multi)
+    data = process_image_channel(data)
    
     # Determine output shape for padding if not provided
     if output_shape is None:
