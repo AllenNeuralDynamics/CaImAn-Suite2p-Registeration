@@ -58,7 +58,7 @@ def CaImAnRegistration(fname, output_path_caiman, output_shape=None, constant_va
     # Create a motion correction object using padded data
     mc = MotionCorrect(padded_data, dview=dview, max_shifts=max_shifts,
                        shifts_opencv=shifts_opencv, nonneg_movie=True,
-                       border_nan=border_nan)
+                       border_nan=border_nan, channel = 1) #TODO: For in-vivo data with 2 channel data, set channel to 1.  
 
     # Perform motion correction
     mc.motion_correct(save_movie=True)
