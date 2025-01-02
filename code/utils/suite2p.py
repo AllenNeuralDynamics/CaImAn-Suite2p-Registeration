@@ -4,7 +4,7 @@ import suite2p
 import numpy as np
 import h5py
 from pathlib import Path
-from tifffile import tifffile
+from tifffile import TiffWriter
 
 def remove_readonly(func, path, excinfo):
     """Clear the readonly bit and reattempt the removal"""
@@ -20,41 +20,43 @@ def delete_suite2p_folder(suite2p_path):
     except Exception as e:
         print(f"Error deleting suite2p folder: {e}")
 
-def suite2pRegistration(fn, output_path_temp, folder_number,output_path_suite2p):
+def suite2pRegistration(fn, output_path_temp, folder_number, output_path_suite2p):
+    print('fn suite2p', fn)
+    
+    # Load Suite2p options
+    ops = np.load("../code/utils/ops.npy", allow_pickle=True).item()
+    
+    # Configure Suite2p database
+    db = {
+        'look_one_level_down': False,  # Do not search subfolders
+        'data_path': [Path(fn).parent],  # Folder containing input TIFFs
+        'tiff_list': [os.path.basename(fn)],  # List of TIFF files to process
+        'save_path0': os.path.join(output_path_temp, folder_number)  # Temporary output path for Suite2p
+    }
 
-  print('fn suite2p', fn)
-  ops = np.load("../code/utils/ops.npy", allow_pickle = True).item()
-  
-  db = {
-    # 'h5py': [], # a single h5 file path
-    # 'h5py_key': 'data',
-    'look_one_level_down': False, # whether to look in ALL subfolders when searching for tiffs
-    'data_path': [Path(fn).parent], 
-                  # a list of folders with tiffs 
-                  # (or folder of folders with tiffs if look_one_level_down is True, or subfolders is not empty)        
-    # 'subfolders': [], # choose subfolders of 'data_path' to look in (optional)
-  #   'fast_disk': 'C:/BIN', # string which specifies where the binary file will be stored (should be an SSD)
-    'tiff_list': [os.path.basename(fn)], # list of tiffs in folder * data_path *!
-    'save_path0': os.path.join(output_path_temp, folder_number) # TODO: make sure output_path is only str
-  }
+    # Run Suite2p registration
+    opsEnd = suite2p.run_s2p(ops=ops, db=db)
 
-  opsEnd = suite2p.run_s2p(ops=ops, db=db)
+    # Load registered binary data (data.bin)
+    reg_file = opsEnd['reg_file']  # Path to registered binary file
+    Ly, Lx = opsEnd['Ly'], opsEnd['Lx']  # Image dimensions (height and width)
+    f_reg = suite2p.io.BinaryFile(Ly=Ly, Lx=Lx, filename=reg_file).data
 
-  # Read in raw tif corresponding 
-  # f_raw = suite2p.io.BinaryFile(Ly=Ly, Lx=Lx, filename=fname)
-  # Create a binary file we will write our registered image to 
-  # f_reg = suite2p.io.BinaryFile(Ly=Ly, Lx=Lx, filename= opsEnd['save_path'] + '/data.bin', n_frames = n_time).data # Set registered binary file to have same n_frames
+    # Save registered data as a multi-page TIFF file
+    with TiffWriter(output_path_suite2p, bigtiff=True) as tif:
+        for frame in f_reg:
+            frame[frame < 0] = 0  # Remove negative values (if any)
+            tif.write(np.uint16(frame))  # Convert to uint16 and write to TIFF
 
-  # Delete the temporary file created by suite2p otherwise registration will not take place for the next trial
-  delete_suite2p_folder(os.path.dirname(opsEnd["reg_file"]))
+    print(f"Registered movie saved as TIFF at {output_path_suite2p}")
 
-  # with tifffile.TiffWriter(output_path_suite2, bigtiff=True) as tif:
-  # f_reg[f_reg < 0] = 0
-  # f_reg = np.uint16(f_reg)
-  # tifffile.imwrite(output_path_suite2p, f_reg)
-  # f_reg.write_tiff(output_path_suite2p)
+    # Save motion correction offsets (optional)
+    hdf5_path = output_path_suite2p + '.h5'
+    with h5py.File(hdf5_path, 'w') as hdf:
+        hdf.create_dataset('R', data=opsEnd['xoff'])  # Row offsets (x-direction)
+        hdf.create_dataset('C', data=opsEnd['yoff'])  # Column offsets (y-direction)
 
-  # Create an HDF5 file and save the NumPy array
-  with h5py.File(output_path_suite2p+'.h5', 'w') as hdf:
-      hdf.create_dataset('R', data=opsEnd['xoff'])
-      hdf.create_dataset('C', data=opsEnd['yoff'])
+    print(f"Motion correction offsets saved in HDF5 format at {hdf5_path}")
+
+    # Clean up temporary Suite2p files (optional)
+    delete_suite2p_folder(os.path.dirname(reg_file))

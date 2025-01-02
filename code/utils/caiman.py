@@ -88,8 +88,8 @@ def CaImAnRegistration(fname, output_path_caiman, output_shape=None, constant_va
     mc.motion_correct(save_movie=True)
     
     # Load corrected movie and save it to disk
-    # m_rig = cm.load(mc.mmap_file)
-    # m_rig.save(output_path_caiman)
+    m_rig = cm.load(mc.mmap_file)
+    m_rig.save(output_path_caiman)
 
     # Get and center shifts around zero
     coordinates = mc.shifts_rig

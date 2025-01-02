@@ -1,7 +1,6 @@
-# hash:sha256:3c09b543c48e44c5101c6214c0ea6b12b9be7764a1be670f4e8152f31acd1e1d
-
+# hash:sha256:7bcd136cdf875a55ea94f58662c2d4e4b7aae6db20d08f16893a9bf0703dc4d3
 ARG REGISTRY_HOST
-FROM $REGISTRY_HOST/codeocean/mambaforge3:23.1.0-4-python3.10.12-ubuntu22.04
+FROM $REGISTRY_HOST/codeocean/tensorflow:2.11-python3.10-cuda11.7.0-runtime-ubuntu22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 
