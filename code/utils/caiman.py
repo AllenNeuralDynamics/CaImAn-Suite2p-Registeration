@@ -22,8 +22,6 @@ def pad_array_center(input_array, output_shape, constant_values):
 def pad_movie(movie, output_shape, constant_values):
     return np.array(list(map(lambda arr: pad_array_center(arr, output_shape, constant_values), movie)))
 
-import numpy as np
-
 def process_image_channel(data):
     """
     Processes multi-channel or single-channel image data.
