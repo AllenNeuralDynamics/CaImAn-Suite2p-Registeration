@@ -12,7 +12,11 @@ import warnings
 from utils.caiman import CaImAnRegistration
 from utils.suite2p import suite2pRegistration
 
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+
 def process_file(fn, folder_number, output_path, use_suite2p, use_caiman):
+    print('In process file')
     try:
         name, ext = os.path.splitext(os.path.basename(fn))
         success = True  # Assume success unless an error occurs
@@ -51,9 +55,11 @@ def run(data_dir, output_path, use_suite2p, use_caiman, writetiff):
     for filename in os.listdir(data_dir):
         # Construct full file path
         file_path = os.path.join(data_dir, filename)
+        
         # Check if the file is a .tif file
         if os.path.isfile(file_path) and filename.endswith('.tif'):
             folder_number =  os.path.basename(data_dir)
+            print('folder_number', folder_number)
             process_file(file_path, folder_number, output_path, use_suite2p, use_caiman)
 
 if __name__ == "__main__": 

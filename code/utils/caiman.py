@@ -1,5 +1,5 @@
 import numpy as np
-from tifffile import imread
+from tifffile import imread, imwrite
 import caiman as cm
 import os
 from caiman.motion_correction import MotionCorrect
@@ -45,16 +45,26 @@ def process_image_channel(data):
 
 # Main CaImAn registration function with padding
 def CaImAnRegistration(fname, output_path_caiman, output_shape=None, constant_values=0):
-    print('fname', fname)
+    
+    print('output_path_caiman:', output_path_caiman)
+    # Ensure the directory exists
+    output_dir = os.path.dirname(output_path_caiman)
+    
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
     try:
         cv2.setNumThreads(0)
     except:
         pass
 
-    # Load the movie data
-    data = imread(fname)  # TODO: Add logic for h5 as well
+    # Debugging imread
+    data = imread(fname)
+    print(f"Data shape after reading: {data.shape}")
+
+    # Debugging channel processing
     data = process_image_channel(data)
-   
+    print(f"Data shape after channel processing: {data.shape}")
+
     # Determine output shape for padding if not provided
     if output_shape is None:
         output_shape = data.shape[1:]  # Use existing frame dimensions if no output shape is specified
@@ -84,23 +94,20 @@ def CaImAnRegistration(fname, output_path_caiman, output_shape=None, constant_va
 
     # Perform motion correction
     mc.motion_correct(save_movie=True)
-    
-    # Load corrected movie and save it to disk
-    m_rig = cm.load(mc.mmap_file)
-    m_rig.save(output_path_caiman)
 
     # Get and center shifts around zero
     coordinates = mc.shifts_rig
     x_shifts = [coord[0] for coord in coordinates]
     y_shifts = [coord[1] for coord in coordinates]
     
-    # Ensure the directory exists
-    output_dir = os.path.dirname(output_path_caiman)
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-
     # Now proceed with writing the HDF5 file
     with h5py.File(output_path_caiman + '.h5', 'w') as hdf:
         hdf.create_dataset('R', data=x_shifts)
         hdf.create_dataset('C', data=y_shifts)
 
+    print('Saving tif file at', output_path_caiman)
+
+    # Load corrected movie and save it to disk
+    m_rig = cm.load(mc.mmap_file)
+    corrected_data = m_rig.astype(np.float32)
+    imwrite(output_path_caiman + ".tif", corrected_data)    

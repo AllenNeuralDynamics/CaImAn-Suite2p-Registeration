@@ -1,6 +1,6 @@
-# hash:sha256:7bcd136cdf875a55ea94f58662c2d4e4b7aae6db20d08f16893a9bf0703dc4d3
+# hash:sha256:787efc930c92c4c96722aac0f41709af994915db6b79e241849ed44357e23264
 ARG REGISTRY_HOST
-FROM $REGISTRY_HOST/codeocean/tensorflow:2.11-python3.10-cuda11.7.0-runtime-ubuntu22.04
+FROM $REGISTRY_HOST/codeocean/mambaforge3:23.1.0-4-python3.10.12-ubuntu22.04
 
 ARG DEBIAN_FRONTEND=noninteractive
 
@@ -18,7 +18,6 @@ RUN mamba install -y \
     && mamba clean -ya
 
 RUN pip install -U --no-cache-dir \
-    aind-data-schema==0.37.3 \
     cython==3.0.11 \
     dateparser==1.2.0 \
     jnormcorre==1.0.0 \
@@ -37,4 +36,3 @@ RUN cd /.code-server \
 	&& tar -xvf code-server.tar.gz \
 	&& rm code-server.tar.gz \
 	&& ln -s /.code-server/code-server-4.9.0-linux-amd64/bin/code-server  /usr/bin/code-server
-
