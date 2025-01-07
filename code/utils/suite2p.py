@@ -43,7 +43,8 @@ def suite2pRegistration(fn, output_path_temp, folder_number, output_path_suite2p
     f_reg = suite2p.io.BinaryFile(Ly=Ly, Lx=Lx, filename=reg_file).data
 
     # Save registered data as a multi-page TIFF file
-    with TiffWriter(output_path_suite2p, bigtiff=True) as tif:
+    tif_path = output_path_suite2p + '.tif'
+    with TiffWriter(tif_path, bigtiff=True) as tif:
         for frame in f_reg:
             frame[frame < 0] = 0  # Remove negative values (if any)
             tif.write(np.uint16(frame))  # Convert to uint16 and write to TIFF
