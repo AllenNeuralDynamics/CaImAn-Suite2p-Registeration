@@ -4,7 +4,7 @@ import suite2p
 import numpy as np
 import h5py
 from pathlib import Path
-from tifffile import TiffWriter
+from tifffile import TiffWriter, imwrite
 
 def remove_readonly(func, path, excinfo):
     """Clear the readonly bit and reattempt the removal"""
@@ -44,10 +44,11 @@ def suite2pRegistration(fn, output_path_temp, folder_number, output_path_suite2p
 
     # Save registered data as a multi-page TIFF file
     tif_path = output_path_suite2p + '.tif'
-    with TiffWriter(tif_path, bigtiff=True) as tif:
-        for frame in f_reg:
-            frame[frame < 0] = 0  # Remove negative values (if any)
-            tif.write(np.uint16(frame))  # Convert to uint16 and write to TIFF
+    imwrite(tif_path, f_reg)  
+    #with TiffWriter(tif_path, bigtiff=True) as tif:
+    #    for frame in f_reg:
+    #        frame[frame < 0] = 0  # Remove negative values (if any)
+    #        tif.write(np.float32(frame))  # Convert to float32 and write to TIFF
 
     print(f"Registered movie saved as TIFF at {output_path_suite2p}")
 
