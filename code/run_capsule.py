@@ -14,7 +14,6 @@ from utils.suite2p import suite2pRegistration
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-
 def process_file(fn, folder_number, output_path, use_suite2p, use_caiman, caiman_intial_temp, jorncorre_intial_temp):
     print('In process file')
     try:
