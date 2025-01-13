@@ -58,6 +58,8 @@ def suite2pRegistration(fn, output_path_temp, folder_number, output_path_suite2p
     with h5py.File(hdf5_path, 'w') as hdf:
         hdf.create_dataset('R', data=opsEnd['xoff'])  # Row offsets (x-direction)
         hdf.create_dataset('C', data=opsEnd['yoff'])  # Column offsets (y-direction)
+        hdf.create_dataset('R_1', data=opsEnd['xoff1'])  # Column offsets (y-direction)
+        hdf.create_dataset('C_1', data=opsEnd['yoff1'])  # Column offsets (y-direction)
 
     print(f"Motion correction offsets saved in HDF5 format at {hdf5_path}")
 
