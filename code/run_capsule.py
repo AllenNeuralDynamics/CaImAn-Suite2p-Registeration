@@ -77,4 +77,4 @@ if __name__ == "__main__":
     # Parse the arguments
     args = parser.parse_args()
 
-    run(args.input, args.output, args.suite2p, args.caiman, args.writetiff, args.caiman_intial_temp, args.jorncorre_intial_temp)
+    run(args.input, args.output, args.suite2p, args.caiman, args.writetiff, args.caiman_initial_temp, args.jorncorre_initial_temp)
