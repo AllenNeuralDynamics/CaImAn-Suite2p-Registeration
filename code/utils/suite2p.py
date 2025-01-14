@@ -32,7 +32,7 @@ def suite2pRegistration(fn, output_path_temp, folder_number, output_path_suite2p
         'data_path': [Path(fn).parent],  # Folder containing input TIFFs
         'tiff_list': [os.path.basename(fn)],  # List of TIFF files to process
         'save_path0': os.path.join(output_path_temp, folder_number),  # Temporary output path for Suite2p
-        'maxregshift': 1.0, # MaxShift = min(Lx,Ly) * maxregshift; Caiman and Strip has a paramater called Maxshift but suite2p doesnt.
+        'maxregshift': 0.5, # MaxShift = min(Lx,Ly) * maxregshift; Caiman and Strip has a paramater called Maxshift but suite2p doesnt.
         #'nonrigid' : True, # TODO: Throws errors in some movies. 
     }
 
