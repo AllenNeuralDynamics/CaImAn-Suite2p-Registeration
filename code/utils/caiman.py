@@ -289,13 +289,6 @@ def CaImAnRegistration(fname, output_path_caiman, use_caiman_template=False, use
         print('Using Hacked up version from stripReg to compute intial template. Using Jnormcorre....')
         template, path_template_list = use_stripRegisteration_first_template_generation(np.transpose(padded_data[:,:, :1000], (1,2,0)), dview, maxshift = 50, path_template_list = [], caiman_template = False)
         mc.motion_correct(save_movie=True, template=np.nanmean(template[:,0,:,:], axis=0)) # Best cluster used to generate initial template movie using jnormcorre. 
-
-    for file_path in path_template_list:
-        if os.path.exists(file_path):
-            print("Deleting jnormcorre tif files.")
-            os.remove(file_path)
-        else:
-            print(f"The file {file_path} does not exist.")
             
     # Get and center shifts around zero
     coordinates = mc.shifts_rig
