@@ -71,8 +71,8 @@ if __name__ == "__main__":
     parser.add_argument('--writetiff', type=bool, default=False, help='Save registered tif of the movies')
     parser.add_argument('--suite2p', type=bool, default=False, help='Register movie using suite2p')
     parser.add_argument('--caiman', type=bool, default=False, help='Register movie using caiman')
-    parser.add_argument('--caiman_intial_temp', type=bool, default=False, help='Use modified method to compute initial template using caiman')
-    parser.add_argument('--jorncorre_intial_temp', type=bool, default=False, help='Use modified method to compute initial template using jnormcorre')
+    parser.add_argument('--caiman_initial_temp', type=bool, default=False, help='Use modified method to compute initial template using caiman')
+    parser.add_argument('--jorncorre_initial_temp', type=bool, default=False, help='Use modified method to compute initial template using jnormcorre')
 
     # Parse the arguments
     args = parser.parse_args()
