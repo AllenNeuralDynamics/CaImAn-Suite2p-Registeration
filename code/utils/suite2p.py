@@ -33,7 +33,7 @@ def suite2pRegistration(fn, output_path_temp, folder_number, output_path_suite2p
         'tiff_list': [os.path.basename(fn)],  # List of TIFF files to process
         'save_path0': os.path.join(output_path_temp, folder_number),  # Temporary output path for Suite2p
         'maxregshift': 1.0, # MaxShift = min(Lx,Ly) * maxregshift; Caiman and Strip has a paramater called Maxshift but suite2p doesnt.
-        'nonrigid' : True,
+        #'nonrigid' : True, # TODO: Throws errors in some movies. 
     }
 
     # Run Suite2p registration
@@ -59,8 +59,8 @@ def suite2pRegistration(fn, output_path_temp, folder_number, output_path_suite2p
     with h5py.File(hdf5_path, 'w') as hdf:
         hdf.create_dataset('R', data=opsEnd['xoff'])  # Row offsets (x-direction)
         hdf.create_dataset('C', data=opsEnd['yoff'])  # Column offsets (y-direction)
-        hdf.create_dataset('R_1', data=opsEnd['xoff1'])  # Column offsets (y-direction)
-        hdf.create_dataset('C_1', data=opsEnd['yoff1'])  # Column offsets (y-direction)
+        #hdf.create_dataset('R_1', data=opsEnd['xoff1'])  # Sub pixel shifts (x-direction); Needs #'nonrigid' : True
+        #hdf.create_dataset('C_1', data=opsEnd['yoff1'])  # Sub pixel shifts (y-direction); #'nonrigid' : True
 
     print(f"Motion correction offsets saved in HDF5 format at {hdf5_path}")
 
