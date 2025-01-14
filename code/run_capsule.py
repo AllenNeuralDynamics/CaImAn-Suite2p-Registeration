@@ -7,6 +7,7 @@ import glob
 import dateparser
 import numpy as np
 import logging
+import traceback
 from tenacity import retry, stop_after_attempt, wait_fixed
 import warnings
 from utils.caiman import CaImAnRegistration
@@ -42,6 +43,7 @@ def process_file(fn, folder_number, output_path, use_suite2p, use_caiman, caiman
 
     except Exception as e:
         logging.error(f"Error processing file {fn}: {e}")
+        logging.error("Traceback details:\n%s", traceback.format_exc())
         return False  # Return False if an error occurred
 
 def run(data_dir, output_path, use_suite2p, use_caiman, writetiff, caiman_intial_temp, jorncorre_intial_temp):

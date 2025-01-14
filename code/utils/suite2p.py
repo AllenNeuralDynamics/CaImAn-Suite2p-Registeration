@@ -25,7 +25,7 @@ def suite2pRegistration(fn, output_path_temp, folder_number, output_path_suite2p
     
     # Load Suite2p options
     ops = np.load("../code/utils/ops.npy", allow_pickle=True).item()
-    
+    print('ops:', ops)
     # Configure Suite2p database
     db = {
         'look_one_level_down': False,  # Do not search subfolders
@@ -33,6 +33,7 @@ def suite2pRegistration(fn, output_path_temp, folder_number, output_path_suite2p
         'tiff_list': [os.path.basename(fn)],  # List of TIFF files to process
         'save_path0': os.path.join(output_path_temp, folder_number),  # Temporary output path for Suite2p
         'maxregshift': 1.0, # MaxShift = min(Lx,Ly) * maxregshift; Caiman and Strip has a paramater called Maxshift but suite2p doesnt.
+        'nonrigid' : True,
     }
 
     # Run Suite2p registration
