@@ -2,8 +2,14 @@
 
 A modular pipeline for motion correction and image registration of iGluSnFR data using Suite2p and CaImAn.
 
+Syntax:
+```
+./run.sh --input <data_directory> --output <output_directory> --pipeline <caiman|suite2p> [--initial_temp <caiman_initial_temp|jorncorre_initial_temp>]
+```
+
 ## Suite2p
 The setting best for our iGluSnFR data is in [ops.npy](code/utils/ops.npy) 
+
 
 ## CaImAn
 Initial Template Options:
