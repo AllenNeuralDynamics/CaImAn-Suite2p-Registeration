@@ -57,8 +57,8 @@ def suite2pRegistration(fn, output_path_temp, folder_number, output_path_suite2p
     # Save motion correction offsets (optional)
     hdf5_path = output_path_suite2p + '.h5'
     with h5py.File(hdf5_path, 'w') as hdf:
-        hdf.create_dataset('R', data=opsEnd['xoff'])  # Row offsets (x-direction)
-        hdf.create_dataset('C', data=opsEnd['yoff'])  # Column offsets (y-direction)
+        hdf.create_dataset('R', data=opsEnd['yoff'])  # Row offsets (y-direction)
+        hdf.create_dataset('C', data=opsEnd['xoff'])  # Column offsets (x-direction)
         hdf.create_dataset('maxregshift', data=db['maxregshift']) # Save max regshift for future reference
 
     print(f"Motion correction offsets saved in HDF5 format at {hdf5_path}")
