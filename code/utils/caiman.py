@@ -294,6 +294,10 @@ def CaImAnRegistration(fname, output_path_caiman, use_caiman_template=False, use
     coordinates = mc.shifts_rig
     x_shifts = [coord[0] for coord in coordinates]
     y_shifts = [coord[1] for coord in coordinates]
+
+    # Multiply x_shifts and y_shifts by -1 
+    x_shifts = [-x for x in x_shifts]
+    y_shifts = [-y for y in y_shifts]
     
     # Now proceed with writing the HDF5 file
     with h5py.File(output_path_caiman + '.h5', 'w') as hdf:
