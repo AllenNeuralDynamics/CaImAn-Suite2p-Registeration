@@ -31,6 +31,7 @@ def read_tiff_file(fn):
 
 def use_stripRegisteration_first_template_generation(Yhp, dview, maxshift, path_template_list, caiman_template=True):
     # Reshape Yhp to 2D where each column is a frame
+    Yhp = Yhp[:,:, :1000]
     reshaped_Yhp = Yhp.reshape(-1, Yhp.shape[2])
 
     # Calculate the correlation matrix
@@ -127,17 +128,8 @@ def use_stripRegisteration_first_template_generation(Yhp, dview, maxshift, path_
             True # replicate values along the boundary (if True, fill in with NaN)
         )
 
-        # # Start the cluster (if a cluster already exists terminate it)
-        # if 'dview' in locals():
-        #     cm.stop_server(dview=dview)
-        
-        # c, dview, n_processes = cm.cluster.setup_cluster(
-        #     backend='multiprocessing', n_processes=None, single_thread=False)
-
-        print(dview)
-
         # Create a motion correction object
-        mc = MotionCorrect(
+        mc_ = MotionCorrect(
             Yhp.transpose(2, 0, 1),
             dview=dview,
             max_shifts=max_shifts,
@@ -146,13 +138,20 @@ def use_stripRegisteration_first_template_generation(Yhp, dview, maxshift, path_
             border_nan=border_nan,
         )
 
-        mc.motion_correct(
+        mc_.motion_correct(
             template=np.mean(Yhp[:, :, best_cluster], axis=2), save_movie=True
         )
-        m_rig = cm.load(mc.mmap_file)
-
+        m_rig = cm.load(mc_.mmap_file)
         F = np.transpose(m_rig, (1, 2, 0))
-        path_template_list.append(mc.mmap_file)
+        path_template_list.append(mc_.mmap_file)
+
+        # Iterate through the list and delete each file
+        for file_path in mc_.mmap_file:
+            if os.path.exists(file_path):  # Check if the file exists
+                os.remove(file_path)  # Delete the file
+                print(f"File '{file_path}' deleted successfully.")
+            else:
+                print(f"File '{file_path}' not found.")
 
     else:
         print("Using JNormCorre for template initial generate...")
@@ -185,11 +184,17 @@ def use_stripRegisteration_first_template_generation(Yhp, dview, maxshift, path_
 
         template,_ = read_tiff_file(
             path_template
-        )  # TODO: Replace with tifffilereader
+        )
+        F = np.squeeze(template)
+        # F = np.transpose(F, (2, 1, 0))
 
-        F = template
-        # F = np.transpose(template, (1, 2, 0))
-
+        try:
+            os.remove(path_template)
+            print(f"File '{path_template}' deleted successfully.")
+        except FileNotFoundError:
+            print(f"Error: File '{path_template}' not found.")
+        except OSError as e:
+            print(f"Error: Could not delete '{path_template}'. {e}")
     return F, path_template_list
 
 # Padding functions
@@ -272,24 +277,29 @@ def CaImAnRegistration(fname, output_path_caiman, use_caiman_template=False, use
     c, dview, n_processes = cm.cluster.setup_cluster(
         backend='multiprocessing', n_processes=None, single_thread=False)
 
-    # Create a motion correction object using padded data
-    mc = MotionCorrect(padded_data, dview=dview, max_shifts=max_shifts,
-                       shifts_opencv=shifts_opencv, nonneg_movie=True,
-                       border_nan=border_nan)
-
     if (not use_caiman_template) and (not use_jormcorre_template):
         print('Using caiman to generate intial template')
         # Perform motion correction
         mc.motion_correct(save_movie=True, template=None) # No template for vanilla caiman. 
+
     elif use_caiman_template:
         print('Using Hacked up version from stripReg to compute intial template. Using Caiman....')
-        template, path_template_list = use_stripRegisteration_first_template_generation(np.transpose(padded_data[:,:, :1000], (1,2,0)), dview, maxshift = 50, path_template_list = [], caiman_template = True)
-        mc.motion_correct(save_movie=True, template=np.nanmean(template, axis=2)) # Best cluster used to generate initial template movie using caiman.  
+        template, path_template_list = use_stripRegisteration_first_template_generation(np.transpose(padded_data, (1,2,0)), dview, maxshift = 50, path_template_list = [], caiman_template = True)
+        # Create a motion correction object using padded data
+        mc = MotionCorrect(padded_data, dview=dview, max_shifts=max_shifts,
+                        shifts_opencv=shifts_opencv, nonneg_movie=True,
+                        border_nan=border_nan)
+        mc.motion_correct(save_movie=True, template=np.nanmean(template, axis=2)) # Best cluster used to generate initial template movie using caiman. 
+
     elif use_jormcorre_template:
         print('Using Hacked up version from stripReg to compute intial template. Using Jnormcorre....')
-        template, path_template_list = use_stripRegisteration_first_template_generation(np.transpose(padded_data[:,:, :1000], (1,2,0)), dview, maxshift = 50, path_template_list = [], caiman_template = False)
-        mc.motion_correct(save_movie=True, template=np.nanmean(template[:,0,:,:], axis=0)) # Best cluster used to generate initial template movie using jnormcorre. 
-            
+        template, path_template_list = use_stripRegisteration_first_template_generation(np.transpose(padded_data, (1,2,0)), dview, maxshift = 50, path_template_list = [], caiman_template = False)
+        # Create a motion correction object using padded data
+        mc = MotionCorrect(padded_data, dview=dview, max_shifts=max_shifts,
+                        shifts_opencv=shifts_opencv, nonneg_movie=True,
+                        border_nan=border_nan)
+        mc.motion_correct(save_movie=True, template=np.nanmean(template, axis=0)) # Best cluster used to generate initial template movie using jnormcorre. 
+    
     # Get and center shifts around zero
     coordinates = mc.shifts_rig
     x_shifts = [coord[0] for coord in coordinates]
