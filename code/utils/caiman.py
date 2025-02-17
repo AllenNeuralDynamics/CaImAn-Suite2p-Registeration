@@ -280,6 +280,9 @@ def CaImAnRegistration(fname, output_path_caiman, use_caiman_template=False, use
     if (not use_caiman_template) and (not use_jormcorre_template):
         print('Using caiman to generate intial template')
         # Perform motion correction
+        mc = MotionCorrect(padded_data, dview=dview, max_shifts=max_shifts,
+                        shifts_opencv=shifts_opencv, nonneg_movie=True,
+                        border_nan=border_nan)
         mc.motion_correct(save_movie=True, template=None) # No template for vanilla caiman. 
 
     elif use_caiman_template:
